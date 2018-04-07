@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射配置 -->
+<mapper namespace="com.film.mapper.FilmMapper">
+
+	<!-- 映射getAllFilms方法的sql -->
+	<select id="getAllFilms"  parameterType="java.lang.String" resultType="Film">
+		<!-- 方法要执行的sql -->
+		select * from ssm_film where delflag ='0'
+	</select>
+	
+	<!-- 映射selectId方法的sql -->
+	<select id="selectId"  resultType="Film">
+		<!-- 方法要执行的sql -->
+		select * from ssm_film where delflag ='0' and  id = #{id}
+	</select>
+	
+	<insert id="addFilm" parameterType="com.film.entity.Film">
+		insert into ssm_film(id,filmNum,filmName,filmYear,filmCategory,language,word,director,actor,releaseTime,movieHall,playTime,summary,delFlag,imgName) 
+			values(s_film_id.nextval, #{filmNum,jdbcType=VARCHAR},#{filmName,jdbcType=VARCHAR},#{filmYear,jdbcType=VARCHAR},#{filmCategory,jdbcType=VARCHAR},#{language,jdbcType=VARCHAR}
+			,#{word,jdbcType=VARCHAR},#{director,jdbcType=VARCHAR},#{actor,jdbcType=VARCHAR},#{releaseTime,jdbcType=VARCHAR},#{movieHall,jdbcType=VARCHAR},#{playTime,jdbcType=DATE},#{summary,jdbcType=VARCHAR}
+			,#{delFlag,jdbcType=INTEGER},#{imgName,jdbcType=VARCHAR})
+	</insert>
+	
+	
+	<!-- 映射selectByFilmName方法的sql -->
+	<select id="selectByFilmName"  parameterType="com.film.vo.FilmVo" resultType="Film">
+		
+		select * from ssm_film f
+		<where>
+			delflag ='0'
+			<if test="film != null and film.filmName != null and film.filmName != ''">
+				and f.filmName like '%${film.filmName}%'
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateFilm" parameterType="Film">
+		update ssm_film 
+		<set>
+			<if test="filmNum != null">
+				filmNum = #{filmNum},
+			</if>
+			<if test="filmName != null">
+				filmName = #{filmName},
+			</if>
+			<if test="filmYear != null">
+				filmYear = #{filmYear},
+			</if>
+			<if test="filmCategory != null">
+				filmCategory = #{filmCategory},
+			</if>
+			<if test="language != null">
+				language = #{language},
+			</if>
+			<if test="word != null">
+				word = #{word},
+			</if>
+			<if test="director != null">
+				director = #{director},
+			</if>
+			<if test="actor != null">
+				actor = #{actor},
+			</if>
+			<if test="releaseTime != null">
+				releaseTime = #{releaseTime},
+			</if>
+			<if test="movieHall != null">
+				movieHall = #{movieHall},
+			</if>
+			<if test="playTime != null">
+				playTime = #{playTime},
+			</if>
+			<if test="summary != null">
+				summary = #{summary}
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	
+	<!-- 批量删除 -->
+	<update id="batchDeleteFilms" parameterType="int">
+		update ssm_film set delFlag = '1' where id in
+		<foreach collection="array" item="filmId" open="(" separator="," close=")">
+			#{filmId}
+		</foreach>
+	</update>
+	
+	<!-- 查询总记录数 -->
+	<select id="selectCountByCondition" parameterType="FilmVo" resultType="int">
+		select count(1) from ssm_film f 
+		<where>
+			delFlag = '0'
+			<if test="film != null and film.filmName != null and film.filmName != ''">
+				and f.filmName like '%${film.filmName}%'
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询分页 oracle -->
+	<select id="selectListByPage" parameterType="FilmVo" resultType="film">
+	select * from (select t.*,rownum rn from ssm_film t 
+	<where>
+		 rownum &lt;= (#{currentPage} * #{pageCount})  
+		 <if test="film != null and film.filmName != null and film.filmName != ''">
+			and t.filmName like '%${film.filmName}%'
+		</if>
+			and delFlag = '0' ) a
+	</where>
+			where delFlag = '0' and a.rn > (#{currentPage} - 1) * #{pageCount}
+	</select>
+</mapper>

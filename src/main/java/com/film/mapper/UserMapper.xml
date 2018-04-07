@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射配置 -->
+<mapper namespace="com.film.mapper.UserMapper">
+
+	<!-- 映射findById方法的sql -->
+	<select id="queryUserByName"  parameterType="java.lang.String" resultType="User">
+		<!-- 方法要执行的sql -->
+		select * from ssm_user u where u.username = #{value}
+	
+	</select>
+	<!-- 插入操作 -->
+	<insert id="save" parameterType="User">
+		insert into ssm_user(id,username,password) 
+			values(s_user_id.nextval, #{username},#{password})
+	</insert>
+	
+</mapper>
